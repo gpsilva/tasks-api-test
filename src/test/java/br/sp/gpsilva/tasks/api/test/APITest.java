@@ -25,7 +25,7 @@ public class APITest {
 	}
 	
 	@Test
-	public void deveAdicionarTarefasComSucesso() {
+	public void deveAdicionarTarefaComSucesso() {
 		RestAssured.given()
 			.body("{ \"task\": \"Teste via API\", \"dueDate\": \"2021-12-31\" }")
 			.contentType(ContentType.JSON)
@@ -37,9 +37,9 @@ public class APITest {
 	}
 	
 	@Test
-	public void naodeveAdicionarTarefaInvalida() {
+	public void naoDeveAdicionarTarefaInvalida() {
 		RestAssured.given()
-			.body("{ \"task\": \"Teste via API\", \"dueDate\": \"2011-02-11\" }")
+			.body("{ \"task\": \"Teste via API\", \"dueDate\": \"2020-12-31\" }")
 			.contentType(ContentType.JSON)
 		.when()
 			.post("/todo")
@@ -48,4 +48,31 @@ public class APITest {
 			.body("message",CoreMatchers.is("Due date must not be in past"))
 		;
 	}
+	
+	@Test
+	public void deveRemoverTarefaComSucesso() {
+		Integer id = RestAssured.given()
+			.body("{ \"task\": \"Tarefa para remocao\", \"dueDate\": \"2021-12-30\" }")
+			.contentType(ContentType.JSON)
+		.when()
+			.post("/todo")
+		.then()
+//			.log().all()
+			.statusCode(201)
+			.extract().path("id")
+		;
+		
+		System.out.println(id);
+		
+		// remover
+		RestAssured.given()
+		.when()
+			.delete("/todo/"+id)
+		.then()
+			.statusCode(204)
+		;
+		
+		
+	}
+	
 }
